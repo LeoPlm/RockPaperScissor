@@ -136,7 +136,7 @@ function checkWins(){
       popupImg.src = "images/humanLeaf.avif"
     }
     else{
-      popupImg.src = "images/humanScissor.jpeg"
+      popupImg.src = "images/humanScissor.png"
     }
     popup.style.display = "flex"
     return true
