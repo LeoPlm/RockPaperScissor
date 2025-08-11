@@ -82,6 +82,7 @@ function draw() {
         elements[i].dy = -elements[i].dy
         elements[j].dx = -elements[j].dx
         elements[j].dy = -elements[j].dy
+        
         transform(elements[i], elements[j])
       }
     }
