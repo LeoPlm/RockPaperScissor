@@ -5,6 +5,10 @@ const popup = document.getElementById("popup")
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
+let numOfElem = window.innerWidth < 1000 ? 7 : 12
+
+console.log(canvas.width)
+
 const size = 40
 
 const images = {
@@ -20,13 +24,13 @@ images.scissor.src = "images/scissor.png"
 const elements = []
 
 
-function createElement(elem, tries = 0) {
+function createElement(elem) {
 
   const newEl = {
     x : Math.random() * (canvas.width - size) + size/2,
     y : Math.random() * (canvas.height - size) + size/2,
-    dx : 3 * (Math.random > 0.5 ? 1 : -1),
-    dy : 2 * (Math.random > 0.5 ? 1 : -1),
+    dx : 3 * (Math.random() > 0.5 ? 1 : -1),
+    dy : 2 * (Math.random() > 0.5 ? 1 : -1),
     elem,
     img : images[elem],
     size
@@ -34,72 +38,76 @@ function createElement(elem, tries = 0) {
 
   for(let i = 0 ; i<elements.length ; i++){
     if(isColliding(elements[i], newEl)){
-      return createElement(elem, tries + 1)
+      return createElement(elem)
     }
   }
   return newEl
 }
 
-for(let i = 0 ; i<8 ; i++){
+for(let i = 0 ; i<numOfElem ; i++){
   elements.push(createElement("rock"))
   elements.push(createElement("paper"))
   elements.push(createElement("scissor"))
 }
 
 function draw() {
-  // Clean the context for each frame
-  if(checkWins()){
-    return
-  }
+  if (checkWins()) return
+  
   context.clearRect(0, 0, canvas.width, canvas.height)
 
-  elements.forEach((el) => {
+  elements.forEach(el => {
     el.x += el.dx
     el.y += el.dy
-
-    if(el.x + size/2 >= canvas.width){
-      el.x = canvas.width - size /2
+    
+    if (el.x - size/2 <= 0 || el.x + size/2 >= canvas.width) {
       el.dx = -el.dx
-    } 
-    if(el.x - size/2 <= 0){
-      el.x = size/2
-      el.dx = -el.dx
-    } 
-    if(el.y + size/2 >= canvas.height){
-      el.y = canvas.height - size/2
+      el.x = Math.max(size/2, Math.min(canvas.width - size/2, el.x))
+    }
+    if (el.y - size/2 <= 0 || el.y + size/2 >= canvas.height) {
       el.dy = -el.dy
-    } 
-    if(el.y - size/2 <= 0){
-      el.y = size/2
-      el.dy = -el.dy
-    } 
+      el.y = Math.max(size/2, Math.min(canvas.height - size/2, el.y))
+    }
   })
 
-  for(let i = 0 ; i<elements.length ; i++){
-    for(j = i+1 ; j<elements.length ; j++){
-      if(isColliding(elements[i], elements[j])){
-        elements[i].dx = -elements[i].dx
-        elements[i].dy = -elements[i].dy
-        elements[j].dx = -elements[j].dx
-        elements[j].dy = -elements[j].dy
-        
-        transform(elements[i], elements[j])
+  for (let i = 0; i < elements.length; i++) {
+    for (let j = i + 1; j < elements.length; j++) {
+      if (isColliding(elements[i], elements[j])) {
+        handleCollision(elements[i], elements[j])
       }
     }
   }
 
-  elements.forEach((el) => {
+  elements.forEach(el => {
     context.drawImage(el.img, el.x - size/2, el.y - size/2, size, size)
   })
 
-  requestAnimationFrame(draw)
-} 
+  requestAnimationFrame(draw);
+}
 
 function isColliding(a, b) {
-  return (
-    Math.abs(a.x - b.x) <= size &&
-    Math.abs(a.y - b.y) <= size
-  )
+  const distance = Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
+  return distance < size * 0.9
+}
+
+function handleCollision(el1, el2) {
+  const dx = el2.x - el1.x
+  const dy = el2.y - el1.y
+  const distance = Math.sqrt(dx * dx + dy * dy)
+  
+  const overlap = (size - distance) / 2
+  
+  const moveX = (overlap * dx) / distance
+  const moveY = (overlap * dy) / distance
+  
+  el1.x -= moveX
+  el1.y -= moveY
+  el2.x += moveX
+  el2.y += moveY
+  
+  [el1.dx, el2.dx] = [el2.dx, el1.dx]
+  [el1.dy, el2.dy] = [el2.dy, el1.dy]
+  
+  transform(el1, el2)
 }
 
 function transform(el1, el2) {
@@ -161,6 +169,6 @@ Object.values(images).forEach((img) => {
 })
 
 window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
 })
