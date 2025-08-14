@@ -99,15 +99,15 @@ function handleCollision(el1, el2) {
   const moveX = (overlap * dx) / distance
   const moveY = (overlap * dy) / distance
   
-  el1.x -= moveX
-  el1.y -= moveY
-  el2.x += moveX
-  el2.y += moveY
+  el1.x -= moveX;
+  el1.y -= moveY;
+  el2.x += moveX;
+  el2.y += moveY;
   
-  [el1.dx, el2.dx] = [el2.dx, el1.dx]
-  [el1.dy, el2.dy] = [el2.dy, el1.dy]
+  [el1.dx, el2.dx] = [el2.dx, el1.dx];
+  [el1.dy, el2.dy] = [el2.dy, el1.dy];
   
-  transform(el1, el2)
+  transform(el1, el2);
 }
 
 function transform(el1, el2) {
@@ -169,6 +169,6 @@ Object.values(images).forEach((img) => {
 })
 
 window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 })
